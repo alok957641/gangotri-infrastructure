@@ -13,8 +13,8 @@ export default function HomePage() {
       <TrustSection />
       <ProjectsGallery/>
         <QuoteFormSection/>
-        <FaqSection/>
         <TestimonialsSection/>
+      <FaqSection/>
         <CtaSection/>
         <Footer/>
        
