@@ -13,8 +13,9 @@ export default function HomePage() {
       <TrustSection />
       <ProjectsGallery/>
         <QuoteFormSection/>
-        <TestimonialsSection/>
       <FaqSection/>
+        <TestimonialsSection/>
+
         <CtaSection/>
         <Footer/>
        
