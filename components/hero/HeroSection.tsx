@@ -14,6 +14,25 @@ const METERS = [
   { label: 'PANEL WARRANTY', target: 25, decimals: 0, suffix: ' YRS' },
 ];
 
+// ---- Sun-diagram ray coordinates, precomputed once at module load ----
+// Fixed to 2 decimal places so the server-rendered HTML and the
+// client's first render produce byte-identical numbers (avoids the
+// float-precision hydration mismatch you'd get from calling
+// Math.cos/Math.sin fresh on both sides).
+const SUN_RAYS = Array.from({ length: 24 }).map((_, i) => {
+  const angle = (i / 24) * 2 * Math.PI;
+  const inner = 178;
+  const outer = i % 3 === 0 ? 196 : 188;
+  return {
+    key: i,
+    x1: (200 + inner * Math.cos(angle)).toFixed(2),
+    y1: (200 + inner * Math.sin(angle)).toFixed(2),
+    x2: (200 + outer * Math.cos(angle)).toFixed(2),
+    y2: (200 + outer * Math.sin(angle)).toFixed(2),
+    major: i % 3 === 0,
+  };
+});
+
 function useCountUp(target: number, decimals: number, start: boolean, duration = 1600) {
   const [value, setValue] = useState(0);
   useEffect(() => {
@@ -34,8 +53,25 @@ function useCountUp(target: number, decimals: number, start: boolean, duration =
 
 const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { scrollY } = useScroll();
   const shouldReduceMotion = useReducedMotion();
+
+  // Some mobile browsers ignore the `autoPlay` HTML attribute unless
+  // `muted` is also set as a JS property (not just the attribute) before
+  // calling play(). This makes autoplay reliable on phones.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    const playPromise = v.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Autoplay was blocked (rare, e.g. low-power mode) — poster image
+        // stays visible as a graceful fallback, nothing else to do here.
+      });
+    }
+  }, []);
 
   const sunY = useTransform(scrollY, [0, 800], [0, 120]);
   const gridOpacity = useTransform(scrollY, [0, 500], [1, 0.4]);
@@ -60,10 +96,14 @@ const HeroSection = () => {
       {/* ===== VIDEO BACKGROUND ===== */}
       <div className="absolute inset-0 z-0">
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
+          // @ts-ignore — legacy attribute some older mobile WebViews still check
+          webkit-playsinline="true"
+          preload="auto"
           poster="/videos/hero-poster.jpg"
           className="h-full w-full object-cover"
         >
@@ -84,9 +124,11 @@ const HeroSection = () => {
       <div className="pointer-events-none absolute left-0 right-0 top-[62%] h-px bg-gradient-to-r from-transparent via-[#F5A623]/25 to-transparent" />
 
       {/* ===== TECHNICAL SUN DIAGRAM ===== */}
+      {/* Hidden on phones — the video background carries the visual on
+          small screens, the sun diagram comes back from `sm:` up. */}
       <motion.div
         style={{ y: shouldReduceMotion ? 0 : sunY }}
-        className="pointer-events-none absolute -right-24 -top-24 h-[520px] w-[520px] sm:-right-16 sm:-top-16"
+        className="pointer-events-none absolute -top-24 -right-16 hidden h-[520px] w-[520px] sm:-right-16 sm:-top-16 sm:block"
       >
         <motion.svg
           viewBox="0 0 400 400"
@@ -97,25 +139,19 @@ const HeroSection = () => {
           <circle cx="200" cy="200" r="170" fill="none" stroke="#F5A623" strokeWidth="0.75" opacity="0.25" />
           <circle cx="200" cy="200" r="130" fill="none" stroke="#F5A623" strokeWidth="0.75" opacity="0.35" />
           <circle cx="200" cy="200" r="90" fill="none" stroke="#F5A623" strokeWidth="0.75" opacity="0.45" />
-          {Array.from({ length: 24 }).map((_, i) => {
-            const angle = (i / 24) * 2 * Math.PI;
-            const inner = 178;
-            const outer = i % 3 === 0 ? 196 : 188;
-            const x1 = 200 + inner * Math.cos(angle);
-            const y1 = 200 + inner * Math.sin(angle);
-            const x2 = 200 + outer * Math.cos(angle);
-            const y2 = 200 + outer * Math.sin(angle);
-            return (
-              <line
-                key={i}
-                x1={x1} y1={y1} x2={x2} y2={y2}
-                stroke="#F5A623"
-                strokeWidth={i % 3 === 0 ? 1.5 : 0.75}
-                opacity={i % 3 === 0 ? 0.6 : 0.3}
-                strokeLinecap="round"
-              />
-            );
-          })}
+          {SUN_RAYS.map((ray) => (
+            <line
+              key={ray.key}
+              x1={ray.x1}
+              y1={ray.y1}
+              x2={ray.x2}
+              y2={ray.y2}
+              stroke="#F5A623"
+              strokeWidth={ray.major ? 1.5 : 0.75}
+              opacity={ray.major ? 0.6 : 0.3}
+              strokeLinecap="round"
+            />
+          ))}
           <circle cx="200" cy="200" r="46" fill="#F5A623" opacity="0.12" />
           <circle cx="200" cy="200" r="46" fill="none" stroke="#F5A623" strokeWidth="1" opacity="0.5" />
         </motion.svg>
