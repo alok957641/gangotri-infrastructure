@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useTransform, useReducedMotion, useMotionValueEvent } from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useRef, useState } from 'react';
@@ -190,12 +190,12 @@ const HeroSection = () => {
           style={{
             y: shouldReduceMotion ? 0 : headlineY,
             opacity: shouldReduceMotion ? 1 : headlineOpacity,
+            textShadow: '0 2px 24px rgba(11,18,32,0.55)',
           }}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.7 }}
           className="mt-6 max-w-3xl font-['Space_Grotesk'] text-[2.6rem] font-semibold leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[4.5rem]"
-          style={{ textShadow: '0 2px 24px rgba(11,18,32,0.55)' }}
         >
           Engineered for the
           <br />
@@ -208,12 +208,12 @@ const HeroSection = () => {
           style={{
             y: shouldReduceMotion ? 0 : subheadY,
             opacity: shouldReduceMotion ? 1 : subheadOpacity,
+            textShadow: '0 1px 16px rgba(11,18,32,0.6)',
           }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.7 }}
           className="mt-6 max-w-xl font-['Inter'] text-base leading-relaxed text-white/75 sm:text-lg"
-          style={{ textShadow: '0 1px 16px rgba(11,18,32,0.6)' }}
         >
           Monsoon-rated mounting, DISCOM-approved net metering, and subsidy
           paperwork handled end to end — installed by crews who&apos;ve done
