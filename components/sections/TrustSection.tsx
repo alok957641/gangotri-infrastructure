@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion, useInView, useAnimation } from 'framer-motion';
+import { motion, useInView, useAnimation, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import {
   Shield,
   Zap,
@@ -46,6 +46,8 @@ const stats = [
 
 export const TrustSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+  const shouldReduceMotion = useReducedMotion();
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
   const controls = useAnimation();
 
@@ -55,6 +57,18 @@ export const TrustSection = () => {
     }
   }, [isInView, controls]);
 
+  // -------- SCROLL-DRIVEN EFFECTS (subtle) --------
+  // Heading parallax – moves up
+  const headingY = useTransform(scrollY, [0, 600], [0, -30]);
+
+  // Background glow – moves horizontally & scales
+  const glowX = useTransform(scrollY, [0, 600], ['-50%', '-10%']);
+  const glowScale = useTransform(scrollY, [0, 600], [1, 1.2]);
+
+  // Grid opacity (scroll‑driven)
+  const gridOpacity = useTransform(scrollY, [0, 800], [0, 1]);
+
+  // Container variants for stats & cards stagger
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -78,14 +92,33 @@ export const TrustSection = () => {
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
       `}</style>
 
-      {/* Same light background, just a real blueprint grid instead of blur+particles */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(11,18,32,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(11,18,32,0.035)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]" />
+      {/* Same light background, just a real blueprint grid – now scroll‑driven */}
+      <motion.div
+        style={{ opacity: gridOpacity }}
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(11,18,32,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(11,18,32,0.035)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]"
+      />
+
+      {/* Subtle scroll‑driven glow */}
+      {!shouldReduceMotion && (
+        <motion.div
+          style={{
+            x: glowX,
+            scale: glowScale,
+          }}
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="pointer-events-none absolute top-0 h-[400px] w-[400px] -translate-y-1/3 rounded-full bg-[#F5A623]/10 blur-[120px]"
+        />
+      )}
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+        {/* Header – parallax y + entry fade */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          style={{
+            y: shouldReduceMotion ? 0 : headingY,
+          }}
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mb-16 max-w-2xl"
         >
