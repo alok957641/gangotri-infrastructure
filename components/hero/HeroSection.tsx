@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useEffect, useRef, useState } from 'react';
 
 // ---- Live meter data -------------------------------------------------
+// Each stat animates like a real inverter / monitoring-dashboard readout.
 const METERS = [
   { label: 'INSTALLED CAPACITY', target: 150.4, decimals: 1, suffix: ' MW' },
   { label: 'ACTIVE SITES', target: 5247, decimals: 0, suffix: '' },
@@ -13,7 +14,11 @@ const METERS = [
   { label: 'PANEL WARRANTY', target: 25, decimals: 0, suffix: ' YRS' },
 ];
 
-// ---- Sun-diagram ray coordinates (precomputed for hydration safety) ----
+// ---- Sun-diagram ray coordinates, precomputed once at module load ----
+// Fixed to 2 decimal places so the server-rendered HTML and the
+// client's first render produce byte-identical numbers (avoids the
+// float-precision hydration mismatch you'd get from calling
+// Math.cos/Math.sin fresh on both sides).
 const SUN_RAYS = Array.from({ length: 24 }).map((_, i) => {
   const angle = (i / 24) * 2 * Math.PI;
   const inner = 178;
@@ -36,7 +41,7 @@ function useCountUp(target: number, decimals: number, start: boolean, duration =
     const t0 = performance.now();
     const tick = (now: number) => {
       const p = Math.min((now - t0) / duration, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
+      const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
       setValue(target * eased);
       if (p < 1) raf = requestAnimationFrame(tick);
     };
@@ -52,43 +57,26 @@ const HeroSection = () => {
   const { scrollY } = useScroll();
   const shouldReduceMotion = useReducedMotion();
 
-  // Autoplay fix for mobile
+  // Some mobile browsers ignore the `autoPlay` HTML attribute unless
+  // `muted` is also set as a JS property (not just the attribute) before
+  // calling play(). This makes autoplay reliable on phones.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     v.muted = true;
     const playPromise = v.play();
     if (playPromise !== undefined) {
-      playPromise.catch(() => {});
+      playPromise.catch(() => {
+        // Autoplay was blocked (rare, e.g. low-power mode) — poster image
+        // stays visible as a graceful fallback, nothing else to do here.
+      });
     }
   }, []);
 
-  // -------- SCROLL-DRIVEN TRANSFORMS (advanced) --------
-  // Video zoom
-  const videoScale = useTransform(scrollY, [0, 600], [1, 1.08]);
+  const sunY = useTransform(scrollY, [0, 800], [0, 120]);
+  const gridOpacity = useTransform(scrollY, [0, 500], [1, 0.4]);
+  const contentOpacity = useTransform(scrollY, [0, 450], [1, 0.35]);
 
-  // Parallax for headline (moves up slower than scroll)
-  const headlineY = useTransform(scrollY, [0, 500], [0, -80]);
-  const headlineOpacity = useTransform(scrollY, [0, 400], [1, 0.6]);
-
-  // Subhead parallax
-  const subheadY = useTransform(scrollY, [0, 500], [0, -60]);
-  const subheadOpacity = useTransform(scrollY, [0, 400], [1, 0.7]);
-
-  // Meter panel – fades and moves down
-  const meterY = useTransform(scrollY, [0, 400], [0, 60]);
-  const meterOpacity = useTransform(scrollY, [0, 350], [1, 0]);
-
-  // Sun diagram – existing y + slower parallax
-  const sunY = useTransform(scrollY, [0, 800], [0, 80]);
-
-  // Grid opacity
-  const gridOpacity = useTransform(scrollY, [0, 500], [1, 0.2]);
-
-  // Content overall opacity (fades out hero as you scroll)
-  const contentOpacity = useTransform(scrollY, [0, 450], [1, 0.3]);
-
-  // Trigger meter animation after mount
   const [metersInView, setMetersInView] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setMetersInView(true), 700);
@@ -100,20 +88,20 @@ const HeroSection = () => {
       ref={containerRef}
       className="relative min-h-[calc(100vh-88px)] overflow-hidden bg-[#0B1220] pt-[88px]"
     >
-      {/* Local fonts — if global, remove this style tag */}
+      {/* Local fonts — move to layout <head> if you already load fonts globally */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
       `}</style>
 
-      {/* ===== VIDEO BACKGROUND with SCROLL ZOOM ===== */}
-      <motion.div className="absolute inset-0 z-0" style={{ scale: videoScale }}>
+      {/* ===== VIDEO BACKGROUND ===== */}
+      <div className="absolute inset-0 z-0">
         <video
           ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
-          // @ts-ignore
+          // @ts-ignore — legacy attribute some older mobile WebViews still check
           webkit-playsinline="true"
           preload="auto"
           poster="/videos/hero-poster.jpg"
@@ -121,20 +109,23 @@ const HeroSection = () => {
         >
           <source src="/solar-video.mp4" type="video/mp4" />
         </video>
-        {/* Overlays – keep same for readability */}
+        {/* Light wash — just enough to keep the meter panel/text readable, video stays visible */}
         <div className="absolute inset-0 bg-[#0B1220]/25" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0B1220] via-[#0B1220]/15 to-[#0B1220]/25" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0B1220]/35 via-transparent to-transparent" />
-      </motion.div>
+      </div>
 
       {/* ===== BLUEPRINT GRID ===== */}
       <motion.div
         style={{ opacity: gridOpacity }}
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(245,166,35,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(245,166,35,0.07)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]"
       />
+      {/* Horizon line — one deliberate structural mark, not decoration */}
       <div className="pointer-events-none absolute left-0 right-0 top-[62%] h-px bg-gradient-to-r from-transparent via-[#F5A623]/25 to-transparent" />
 
       {/* ===== TECHNICAL SUN DIAGRAM ===== */}
+      {/* Hidden on phones — the video background carries the visual on
+          small screens, the sun diagram comes back from `sm:` up. */}
       <motion.div
         style={{ y: shouldReduceMotion ? 0 : sunY }}
         className="pointer-events-none absolute -top-24 -right-16 hidden h-[520px] w-[520px] sm:-right-16 sm:-top-16 sm:block"
@@ -166,12 +157,12 @@ const HeroSection = () => {
         </motion.svg>
       </motion.div>
 
-      {/* ===== CONTENT with parallax ===== */}
+      {/* ===== CONTENT ===== */}
       <motion.div
         style={{ opacity: shouldReduceMotion ? 1 : contentOpacity }}
         className="relative z-10 mx-auto flex min-h-[calc(100vh-88px)] w-full max-w-7xl flex-col justify-center px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
       >
-        {/* Live status line – fixed (no scroll effect) */}
+        {/* Live status line */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -185,17 +176,13 @@ const HeroSection = () => {
           5,247 SYSTEMS ONLINE — LIVE ACROSS INDIA
         </motion.div>
 
-        {/* Headline – parallax + fade */}
+        {/* Headline */}
         <motion.h1
-          style={{
-            y: shouldReduceMotion ? 0 : headlineY,
-            opacity: shouldReduceMotion ? 1 : headlineOpacity,
-            textShadow: '0 2px 24px rgba(11,18,32,0.55)',
-          }}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.7 }}
           className="mt-6 max-w-3xl font-['Space_Grotesk'] text-[2.6rem] font-semibold leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[4.5rem]"
+          style={{ textShadow: '0 2px 24px rgba(11,18,32,0.55)' }}
         >
           Engineered for the
           <br />
@@ -203,24 +190,20 @@ const HeroSection = () => {
           <span className="text-[#F5A623]"> not the brochure.</span>
         </motion.h1>
 
-        {/* Subhead – parallax + fade */}
+        {/* Subhead */}
         <motion.p
-          style={{
-            y: shouldReduceMotion ? 0 : subheadY,
-            opacity: shouldReduceMotion ? 1 : subheadOpacity,
-            textShadow: '0 1px 16px rgba(11,18,32,0.6)',
-          }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.7 }}
           className="mt-6 max-w-xl font-['Inter'] text-base leading-relaxed text-white/75 sm:text-lg"
+          style={{ textShadow: '0 1px 16px rgba(11,18,32,0.6)' }}
         >
           Monsoon-rated mounting, DISCOM-approved net metering, and subsidy
           paperwork handled end to end — installed by crews who&apos;ve done
           this on 5,000+ Indian rooftops.
         </motion.p>
 
-        {/* CTAs – fixed (no scroll effect) */}
+        {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -246,17 +229,14 @@ const HeroSection = () => {
           </a>
         </motion.div>
 
-        {/* ===== LIVE METER PANEL – scroll fade + move ===== */}
+        {/* ===== LIVE METER PANEL — signature element ===== */}
         <motion.div
-          style={{
-            y: shouldReduceMotion ? 0 : meterY,
-            opacity: shouldReduceMotion ? 1 : meterOpacity,
-          }}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.7 }}
           className="relative mt-16 max-w-3xl overflow-hidden rounded-lg border border-white/15 bg-[#0B1220]/55 backdrop-blur-md"
         >
+          {/* one deliberate scan sweep, not scattered ambient motion */}
           {!shouldReduceMotion && (
             <motion.div
               initial={{ x: '-100%' }}
