@@ -1,25 +1,14 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { ArrowRight, PhoneCall } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const CtaSection = () => {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
   const isInView = useInView(ref, { once: true, amount: 0.3 });
   const shouldReduceMotion = useReducedMotion();
-
-  // -------- SCROLL-DRIVEN EFFECTS (subtle) --------
-  const headingY = useTransform(scrollY, [0, 600], [0, -40]);
-  const headingScale = useTransform(scrollY, [0, 600], [1, 0.98]);
-  const textY = useTransform(scrollY, [0, 600], [0, -20]);
-  const textOpacity = useTransform(scrollY, [0, 400], [1, 0.6]);
-  const buttonScale = useTransform(scrollY, [0, 600], [1, 0.95]);
-  const buttonOpacity = useTransform(scrollY, [0, 500], [1, 0.7]);
-  const glowX = useTransform(scrollY, [0, 600], ['-50%', '-30%']);
-  const glowScale = useTransform(scrollY, [0, 600], [1, 1.2]);
 
   return (
     <section
@@ -30,24 +19,19 @@ export const CtaSection = () => {
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
       `}</style>
 
-      {/* faint blueprint grid */}
+      {/* faint blueprint grid, consistent with hero + testimonials */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(11,18,32,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(11,18,32,0.04)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]" />
 
-      {/* slow-drifting glow */}
+      {/* slow-drifting glow, one deliberate ambient touch */}
       {!shouldReduceMotion && (
         <motion.div
-          style={{
-            x: glowX,
-            scale: glowScale,
-          }}
-          animate={{ opacity: [0.4, 0.7, 0.4] }}
+          animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.08, 1] }}
           transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          className="pointer-events-none absolute top-0 h-[420px] w-[420px] -translate-y-1/3 rounded-full bg-[#F5A623]/15 blur-[100px]"
+          className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-[#F5A623]/15 blur-[100px]"
         />
       )}
 
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        {/* Top badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -59,43 +43,29 @@ export const CtaSection = () => {
           <span className="h-px w-6 bg-[#F5A623]" />
         </motion.div>
 
-        {/* Heading – revised */}
         <motion.h2
-          style={{
-            y: shouldReduceMotion ? 0 : headingY,
-            scale: shouldReduceMotion ? 1 : headingScale,
-          }}
           initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.1, duration: 0.7 }}
           className="mt-5 font-['Space_Grotesk'] text-3xl font-semibold leading-[1.1] tracking-tight text-black sm:text-5xl"
         >
-          Your roof is already costing you.
+          Your roof is already
           <br />
-          <span className="text-[#F5A623]">Turn it into an asset.</span>
+          generating a bill. <span className="text-[#F5A623]">Flip it.</span>
         </motion.h2>
 
-        {/* Subtext – revised */}
         <motion.p
-          style={{
-            y: shouldReduceMotion ? 0 : textY,
-            opacity: shouldReduceMotion ? 1 : textOpacity,
-          }}
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.2, duration: 0.7 }}
           className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-black/55 sm:text-lg"
         >
-          Schedule a free site survey and get a detailed proposal with exact system sizing,
-          cost breakdown, and subsidy calculations — no obligation, no sales pressure.
+          A free site survey gets you an exact system size, cost, and
+          subsidy amount in writing — no obligation, no pushy follow-up
+          calls.
         </motion.p>
 
-        {/* Buttons – scale + opacity */}
         <motion.div
-          style={{
-            scale: shouldReduceMotion ? 1 : buttonScale,
-            opacity: shouldReduceMotion ? 1 : buttonOpacity,
-          }}
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.3, duration: 0.7 }}
@@ -107,7 +77,7 @@ export const CtaSection = () => {
             asChild
           >
             <a href="/contact">
-              Request your free survey
+              Get your free quote
               <ArrowRight className="ml-2 h-4 w-4" />
             </a>
           </Button>
@@ -120,7 +90,6 @@ export const CtaSection = () => {
           </a>
         </motion.div>
 
-        {/* Trust badges */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
