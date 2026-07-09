@@ -1,12 +1,9 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { ArrowUpRight, MapPin } from 'lucide-react';
 
-// Drop your real project photography into /public/images/projects/
-// and swap the `image` path below. Nothing else needs to change —
-// the frame, caption bar and hover zoom are already wired up.
 const projects = [
   {
     code: 'PRJ-041',
@@ -54,7 +51,42 @@ const projects = [
 
 export const ProjectsGallery = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
+  const shouldReduceMotion = useReducedMotion();
+
+  // -------- SCROLL-DRIVEN EFFECTS (subtle) --------
+  // Heading parallax – moves up & fades slightly
+  const headingY = useTransform(scrollY, [0, 600], [0, -30]);
+  const headingOpacity = useTransform(scrollY, [0, 500], [1, 0.7]);
+
+  // Background glow – moves horizontally with scroll
+  const glowX = useTransform(scrollY, [0, 600], ['-50%', '-10%']);
+  const glowScale = useTransform(scrollY, [0, 600], [1, 1.2]);
+
+  // Grid opacity (scroll‑driven)
+  const gridOpacity = useTransform(scrollY, [0, 800], [0, 1]);
+
+  // Container variants for gallery items stagger
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.15,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.55, ease: 'easeOut' },
+    },
+  };
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-white py-20 md:py-28">
@@ -62,11 +94,32 @@ export const ProjectsGallery = () => {
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
       `}</style>
 
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(11,18,32,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(11,18,32,0.035)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]" />
+      {/* Blueprint grid – scroll‑driven opacity */}
+      <motion.div
+        style={{ opacity: gridOpacity }}
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(11,18,32,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(11,18,32,0.035)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]"
+      />
+
+      {/* Subtle scroll‑driven glow */}
+      {!shouldReduceMotion && (
+        <motion.div
+          style={{
+            x: glowX,
+            scale: glowScale,
+          }}
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="pointer-events-none absolute top-0 h-[400px] w-[400px] -translate-y-1/3 rounded-full bg-[#F5A623]/10 blur-[120px]"
+        />
+      )}
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+        {/* Header – with parallax */}
         <motion.div
+          style={{
+            y: shouldReduceMotion ? 0 : headingY,
+            opacity: shouldReduceMotion ? 1 : headingOpacity,
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
@@ -92,20 +145,25 @@ export const ProjectsGallery = () => {
           </a>
         </motion.div>
 
-        {/* Gallery grid */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Gallery grid – stagger */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {projects.map((project, i) => (
             <motion.div
               key={project.code}
-              initial={{ opacity: 0, y: 24 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.55, delay: 0.1 + i * 0.07, ease: 'easeOut' }}
+              variants={itemVariants}
+              whileHover={{
+                y: -4,
+                transition: { type: 'spring', stiffness: 400, damping: 15 },
+              }}
               className="group relative overflow-hidden rounded-lg border border-[#0B1220]/10 bg-[#0B1220]"
             >
               {/* Photo frame */}
               <div className="relative aspect-[4/3] w-full overflow-hidden">
-                {/* Fallback technical pattern shows behind the <img>; once a real
-                    photo is dropped in at the path above, it simply covers this. */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(245,166,35,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(245,166,35,0.08)_1px,transparent_1px)] bg-[size:24px_24px]" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <MapPin className="h-6 w-6 text-white/15" strokeWidth={1.5} />
@@ -121,7 +179,7 @@ export const ProjectsGallery = () => {
                   className="absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-700 group-hover:scale-105 [&[src]]:opacity-100"
                 />
 
-                {/* corner brackets — site-survey framing mark */}
+                {/* corner brackets */}
                 <span className="absolute left-3 top-3 h-3 w-3 border-l border-t border-white/40" />
                 <span className="absolute right-3 top-3 h-3 w-3 border-r border-t border-white/40" />
                 <span className="absolute bottom-3 left-3 h-3 w-3 border-b border-l border-white/40" />
@@ -146,7 +204,7 @@ export const ProjectsGallery = () => {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
