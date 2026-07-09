@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Phone, Mail, MapPin, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -14,10 +14,55 @@ const steps = [
 
 export const QuoteFormSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
   const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
+  const shouldReduceMotion = useReducedMotion();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+
+  // -------- SCROLL-DRIVEN EFFECTS (subtle) --------
+  // Heading parallax – moves up & fades slightly
+  const headingY = useTransform(scrollY, [0, 600], [0, -30]);
+  const headingOpacity = useTransform(scrollY, [0, 500], [1, 0.7]);
+
+  // Background glow – moves horizontally with scroll
+  const glowX = useTransform(scrollY, [0, 600], ['-50%', '-10%']);
+  const glowScale = useTransform(scrollY, [0, 600], [1, 1.2]);
+
+  // Grid opacity (scroll‑driven)
+  const gridOpacity = useTransform(scrollY, [0, 800], [0, 1]);
+
+  // Container variants for steps stagger
+  const stepsContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const stepItemVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  };
+
+  // Form panel animation – slide up + fade
+  const formVariants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, delay: 0.15, ease: 'easeOut' },
+    },
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,12 +101,33 @@ export const QuoteFormSection = () => {
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
       `}</style>
 
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(245,166,35,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(245,166,35,0.06)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]" />
+      {/* Blueprint grid – scroll‑driven opacity */}
+      <motion.div
+        style={{ opacity: gridOpacity }}
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(245,166,35,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(245,166,35,0.06)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]"
+      />
+
+      {/* Subtle scroll‑driven glow */}
+      {!shouldReduceMotion && (
+        <motion.div
+          style={{
+            x: glowX,
+            scale: glowScale,
+          }}
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="pointer-events-none absolute top-0 h-[400px] w-[400px] -translate-y-1/3 rounded-full bg-[#F5A623]/10 blur-[120px]"
+        />
+      )}
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-14 lg:grid-cols-[0.85fr_1fr] lg:gap-20">
           {/* ===== LEFT: pitch + process steps ===== */}
           <motion.div
+            style={{
+              y: shouldReduceMotion ? 0 : headingY,
+              opacity: shouldReduceMotion ? 1 : headingOpacity,
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
@@ -81,10 +147,15 @@ export const QuoteFormSection = () => {
               negotiation.
             </p>
 
-            {/* Process steps — genuine sequence, so numbering earns its place */}
-            <div className="mt-10 space-y-6 border-l border-white/10 pl-6">
+            {/* Process steps — staggered reveal */}
+            <motion.div
+              variants={stepsContainerVariants}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              className="mt-10 space-y-6 border-l border-white/10 pl-6"
+            >
               {steps.map((step) => (
-                <div key={step.n} className="relative">
+                <motion.div key={step.n} variants={stepItemVariants} className="relative">
                   <span className="absolute -left-[31px] top-0 flex h-6 w-6 items-center justify-center rounded-full border border-[#F5A623]/40 bg-[#0B1220] font-['IBM_Plex_Mono'] text-[10px] text-[#F5A623]">
                     {step.n}
                   </span>
@@ -92,9 +163,9 @@ export const QuoteFormSection = () => {
                     {step.title}
                   </h3>
                   <p className="mt-1 text-sm leading-relaxed text-white/45">{step.desc}</p>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 font-['IBM_Plex_Mono'] text-sm text-white/60">
               <a href="tel:+911234567890" className="flex items-center gap-2.5 hover:text-white">
@@ -111,9 +182,9 @@ export const QuoteFormSection = () => {
 
           {/* ===== RIGHT: form panel ===== */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.15 }}
+            variants={formVariants}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
             className="relative rounded-lg border border-white/10 bg-white/[0.03] p-6 sm:p-8"
           >
             {submitted ? (
