@@ -12,19 +12,12 @@ export const CtaSection = () => {
   const shouldReduceMotion = useReducedMotion();
 
   // -------- SCROLL-DRIVEN EFFECTS (subtle) --------
-  // Heading parallax – moves up slightly slower
   const headingY = useTransform(scrollY, [0, 600], [0, -40]);
   const headingScale = useTransform(scrollY, [0, 600], [1, 0.98]);
-
-  // Text fade & move
   const textY = useTransform(scrollY, [0, 600], [0, -20]);
   const textOpacity = useTransform(scrollY, [0, 400], [1, 0.6]);
-
-  // Buttons – subtle zoom out
   const buttonScale = useTransform(scrollY, [0, 600], [1, 0.95]);
   const buttonOpacity = useTransform(scrollY, [0, 500], [1, 0.7]);
-
-  // Background glow – moves & scales (only if not reduced motion)
   const glowX = useTransform(scrollY, [0, 600], ['-50%', '-30%']);
   const glowScale = useTransform(scrollY, [0, 600], [1, 1.2]);
 
@@ -40,7 +33,7 @@ export const CtaSection = () => {
       {/* faint blueprint grid */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(11,18,32,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(11,18,32,0.04)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]" />
 
-      {/* slow-drifting glow with scroll-driven position/scale */}
+      {/* slow-drifting glow */}
       {!shouldReduceMotion && (
         <motion.div
           style={{
@@ -54,7 +47,7 @@ export const CtaSection = () => {
       )}
 
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        {/* Top badge – no scroll effect */}
+        {/* Top badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -66,7 +59,7 @@ export const CtaSection = () => {
           <span className="h-px w-6 bg-[#F5A623]" />
         </motion.div>
 
-        {/* Heading – parallax + scale */}
+        {/* Heading – revised */}
         <motion.h2
           style={{
             y: shouldReduceMotion ? 0 : headingY,
@@ -77,12 +70,12 @@ export const CtaSection = () => {
           transition={{ delay: 0.1, duration: 0.7 }}
           className="mt-5 font-['Space_Grotesk'] text-3xl font-semibold leading-[1.1] tracking-tight text-black sm:text-5xl"
         >
-          Your roof is already
+          Your roof is already costing you.
           <br />
-          generating a bill. <span className="text-[#F5A623]">Flip it.</span>
+          <span className="text-[#F5A623]">Turn it into an asset.</span>
         </motion.h2>
 
-        {/* Text – fade + move */}
+        {/* Subtext – revised */}
         <motion.p
           style={{
             y: shouldReduceMotion ? 0 : textY,
@@ -93,9 +86,8 @@ export const CtaSection = () => {
           transition={{ delay: 0.2, duration: 0.7 }}
           className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-black/55 sm:text-lg"
         >
-          A free site survey gets you an exact system size, cost, and
-          subsidy amount in writing — no obligation, no pushy follow-up
-          calls.
+          Schedule a free site survey and get a detailed proposal with exact system sizing,
+          cost breakdown, and subsidy calculations — no obligation, no sales pressure.
         </motion.p>
 
         {/* Buttons – scale + opacity */}
@@ -115,7 +107,7 @@ export const CtaSection = () => {
             asChild
           >
             <a href="/contact">
-              Get your free quote
+              Request your free survey
               <ArrowRight className="ml-2 h-4 w-4" />
             </a>
           </Button>
@@ -128,7 +120,7 @@ export const CtaSection = () => {
           </a>
         </motion.div>
 
-        {/* Trust badges – no scroll effect, only in‑view */}
+        {/* Trust badges */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
