@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { motion, useInView, useReducedMotion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Plus } from 'lucide-react';
 
 const faqs = [
@@ -33,8 +33,40 @@ const faqs = [
 
 export const FaqSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
   const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
+  const shouldReduceMotion = useReducedMotion();
   const [open, setOpen] = useState<number | null>(0);
+
+  // -------- SCROLL-DRIVEN EFFECTS (subtle) --------
+  // Heading parallax – moves up & fades slightly
+  const headingY = useTransform(scrollY, [0, 600], [0, -30]);
+  const headingOpacity = useTransform(scrollY, [0, 500], [1, 0.7]);
+
+  // Background glow – moves horizontally with scroll
+  const glowX = useTransform(scrollY, [0, 600], ['-50%', '-20%']);
+  const glowScale = useTransform(scrollY, [0, 600], [1, 1.3]);
+
+  // Container variants for stagger
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.15,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  };
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-white py-20 md:py-28">
@@ -42,10 +74,29 @@ export const FaqSection = () => {
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
       `}</style>
 
+      {/* faint blueprint grid */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(11,18,32,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(11,18,32,0.035)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]" />
 
-      <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      {/* scroll-driven glow */}
+      {!shouldReduceMotion && (
         <motion.div
+          style={{
+            x: glowX,
+            scale: glowScale,
+          }}
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+          className="pointer-events-none absolute top-0 h-[400px] w-[400px] -translate-y-1/3 rounded-full bg-[#F5A623]/10 blur-[120px]"
+        />
+      )}
+
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        {/* Header – with parallax */}
+        <motion.div
+          style={{
+            y: shouldReduceMotion ? 0 : headingY,
+            opacity: shouldReduceMotion ? 1 : headingOpacity,
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
@@ -62,17 +113,19 @@ export const FaqSection = () => {
           </h2>
         </motion.div>
 
+        {/* FAQ List – stagger animation */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
           className="overflow-hidden rounded-lg border border-[#0B1220]/10"
         >
           {faqs.map((faq, i) => {
             const isOpen = open === i;
             return (
-              <div
+              <motion.div
                 key={faq.q}
+                variants={itemVariants}
                 className={i !== 0 ? 'border-t border-[#0B1220]/10' : ''}
               >
                 <button
@@ -109,11 +162,12 @@ export const FaqSection = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
             );
           })}
         </motion.div>
 
+        {/* Bottom link – subtle scroll effect */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -129,3 +183,5 @@ export const FaqSection = () => {
     </section>
   );
 };
+
+export default FaqSection;
