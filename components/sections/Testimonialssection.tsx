@@ -1,6 +1,7 @@
 'use client';
 
-import { useReducedMotion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { Star, Quote } from 'lucide-react';
 
 // ============================================================
@@ -80,10 +81,53 @@ const row2 = [...testimonials.slice(4, 8), ...testimonials.slice(4, 8)];
 // SECTION
 // ============================================================
 export const TestimonialsSection = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+  const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
   const shouldReduceMotion = useReducedMotion();
 
+  // -------- SCROLL-DRIVEN EFFECTS (subtle) --------
+  // Heading parallax – moves up & fades slightly
+  const headingY = useTransform(scrollY, [0, 600], [0, -30]);
+  const headingOpacity = useTransform(scrollY, [0, 500], [1, 0.7]);
+
+  // Background glow – moves horizontally with scroll
+  const glowX = useTransform(scrollY, [0, 600], ['-50%', '-10%']);
+  const glowScale = useTransform(scrollY, [0, 600], [1, 1.2]);
+
+  // Grid opacity (scroll‑driven)
+  const gridOpacity = useTransform(scrollY, [0, 800], [0, 1]);
+
+  // Marquee rows – subtle fade/scale as you scroll
+  const rowOpacity = useTransform(scrollY, [0, 400], [0.6, 1]);
+  const rowScale = useTransform(scrollY, [0, 400], [0.97, 1]);
+
+  // Container variants for header stagger
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.15,
+      },
+    },
+  };
+
+  const headerItemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: 'easeOut' },
+    },
+  };
+
   return (
-    <section className="relative overflow-hidden border-t border-black/10 bg-[#0B1220] py-20 md:py-28">
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden border-t border-black/10 bg-[#0B1220] py-20 md:py-28"
+    >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
@@ -112,45 +156,94 @@ export const TestimonialsSection = () => {
         }
       `}</style>
 
-      {/* faint blueprint grid, consistent with hero */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(245,166,35,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(245,166,35,0.05)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_85%)]" />
+      {/* faint blueprint grid, scroll-driven opacity */}
+      <motion.div
+        style={{ opacity: gridOpacity }}
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(245,166,35,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(245,166,35,0.05)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_85%)]"
+      />
+
+      {/* Subtle scroll-driven glow */}
+      {!shouldReduceMotion && (
+        <motion.div
+          style={{
+            x: glowX,
+            scale: glowScale,
+          }}
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="pointer-events-none absolute top-0 h-[400px] w-[400px] -translate-y-1/3 rounded-full bg-[#F5A623]/10 blur-[120px]"
+        />
+      )}
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-14 max-w-2xl">
-          <div className="flex items-center gap-2.5 font-['IBM_Plex_Mono'] text-[11px] tracking-[0.15em] text-[#F5A623]/80">
+        {/* Header – with parallax */}
+        <motion.div
+          style={{
+            y: shouldReduceMotion ? 0 : headingY,
+            opacity: shouldReduceMotion ? 1 : headingOpacity,
+          }}
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="mb-14 max-w-2xl"
+        >
+          <motion.div
+            variants={headerItemVariants}
+            className="flex items-center gap-2.5 font-['IBM_Plex_Mono'] text-[11px] tracking-[0.15em] text-[#F5A623]/80"
+          >
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F5A623] opacity-60" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[#F5A623]" />
             </span>
             FIELD REPORTS — LIVE FROM 5,000+ ROOFTOPS
-          </div>
-          <h2 className="mt-4 font-['Space_Grotesk'] text-3xl font-semibold tracking-tight text-white md:text-4xl">
+          </motion.div>
+          <motion.h2
+            variants={headerItemVariants}
+            transition={{ delay: 0.05 }}
+            className="mt-4 font-['Space_Grotesk'] text-3xl font-semibold tracking-tight text-white md:text-4xl"
+          >
             What the meter says after we leave.
-          </h2>
-          <p className="mt-3 text-base leading-relaxed text-white/55">
+          </motion.h2>
+          <motion.p
+            variants={headerItemVariants}
+            transition={{ delay: 0.1 }}
+            className="mt-3 text-base leading-relaxed text-white/55"
+          >
             Unedited feedback from residential, commercial, and industrial
             installs across Maharashtra — the same crews, month after month.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </div>
 
-      {/* Row 1 — scrolls left */}
-      <div className="marquee-row relative mt-2 w-full [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+      {/* Row 1 — scrolls left, with subtle opacity/scale effect */}
+      <motion.div
+        style={{
+          opacity: shouldReduceMotion ? 1 : rowOpacity,
+          scale: shouldReduceMotion ? 1 : rowScale,
+        }}
+        className="marquee-row relative mt-2 w-full [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
+      >
         <div className={`marquee-track flex w-max gap-5 px-4 sm:px-6 ${shouldReduceMotion ? '!animate-none' : ''}`}>
           {row1.map((t, i) => (
             <TestimonialCard key={`${t.name}-${i}`} t={t} />
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Row 2 — scrolls right, offset for rhythm */}
-      <div className="marquee-row relative mt-5 w-full [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+      <motion.div
+        style={{
+          opacity: shouldReduceMotion ? 1 : rowOpacity,
+          scale: shouldReduceMotion ? 1 : rowScale,
+        }}
+        className="marquee-row relative mt-5 w-full [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
+      >
         <div className={`marquee-track-reverse flex w-max gap-5 px-4 sm:px-6 ${shouldReduceMotion ? '!animate-none' : ''}`}>
           {row2.map((t, i) => (
             <TestimonialCard key={`${t.name}-${i}`} t={t} />
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
