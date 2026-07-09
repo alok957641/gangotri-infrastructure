@@ -1,14 +1,32 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, PhoneCall } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const CtaSection = () => {
   const ref = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
   const isInView = useInView(ref, { once: true, amount: 0.3 });
   const shouldReduceMotion = useReducedMotion();
+
+  // -------- SCROLL-DRIVEN EFFECTS (subtle) --------
+  // Heading parallax – moves up slightly slower
+  const headingY = useTransform(scrollY, [0, 600], [0, -40]);
+  const headingScale = useTransform(scrollY, [0, 600], [1, 0.98]);
+
+  // Text fade & move
+  const textY = useTransform(scrollY, [0, 600], [0, -20]);
+  const textOpacity = useTransform(scrollY, [0, 400], [1, 0.6]);
+
+  // Buttons – subtle zoom out
+  const buttonScale = useTransform(scrollY, [0, 600], [1, 0.95]);
+  const buttonOpacity = useTransform(scrollY, [0, 500], [1, 0.7]);
+
+  // Background glow – moves & scales (only if not reduced motion)
+  const glowX = useTransform(scrollY, [0, 600], ['-50%', '-30%']);
+  const glowScale = useTransform(scrollY, [0, 600], [1, 1.2]);
 
   return (
     <section
@@ -19,19 +37,24 @@ export const CtaSection = () => {
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
       `}</style>
 
-      {/* faint blueprint grid, consistent with hero + testimonials */}
+      {/* faint blueprint grid */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(11,18,32,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(11,18,32,0.04)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]" />
 
-      {/* slow-drifting glow, one deliberate ambient touch */}
+      {/* slow-drifting glow with scroll-driven position/scale */}
       {!shouldReduceMotion && (
         <motion.div
-          animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.08, 1] }}
+          style={{
+            x: glowX,
+            scale: glowScale,
+          }}
+          animate={{ opacity: [0.4, 0.7, 0.4] }}
           transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-[#F5A623]/15 blur-[100px]"
+          className="pointer-events-none absolute top-0 h-[420px] w-[420px] -translate-y-1/3 rounded-full bg-[#F5A623]/15 blur-[100px]"
         />
       )}
 
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+        {/* Top badge – no scroll effect */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -43,7 +66,12 @@ export const CtaSection = () => {
           <span className="h-px w-6 bg-[#F5A623]" />
         </motion.div>
 
+        {/* Heading – parallax + scale */}
         <motion.h2
+          style={{
+            y: shouldReduceMotion ? 0 : headingY,
+            scale: shouldReduceMotion ? 1 : headingScale,
+          }}
           initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.1, duration: 0.7 }}
@@ -54,7 +82,12 @@ export const CtaSection = () => {
           generating a bill. <span className="text-[#F5A623]">Flip it.</span>
         </motion.h2>
 
+        {/* Text – fade + move */}
         <motion.p
+          style={{
+            y: shouldReduceMotion ? 0 : textY,
+            opacity: shouldReduceMotion ? 1 : textOpacity,
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.2, duration: 0.7 }}
@@ -65,7 +98,12 @@ export const CtaSection = () => {
           calls.
         </motion.p>
 
+        {/* Buttons – scale + opacity */}
         <motion.div
+          style={{
+            scale: shouldReduceMotion ? 1 : buttonScale,
+            opacity: shouldReduceMotion ? 1 : buttonOpacity,
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.3, duration: 0.7 }}
@@ -90,6 +128,7 @@ export const CtaSection = () => {
           </a>
         </motion.div>
 
+        {/* Trust badges – no scroll effect, only in‑view */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
