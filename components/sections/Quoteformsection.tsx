@@ -169,13 +169,13 @@ export const QuoteFormSection = () => {
 
             <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 font-['IBM_Plex_Mono'] text-sm text-white/60">
               <a href="tel:+911234567890" className="flex items-center gap-2.5 hover:text-white">
-                <Phone className="h-4 w-4 text-[#F5A623]" /> +91 12345 67890
+                <Phone className="h-4 w-4 text-[#F5A623]" /> +91 91510 78495
               </a>
-              <a href="mailto:hello@gangotriinfra.in" className="flex items-center gap-2.5 hover:text-white">
-                <Mail className="h-4 w-4 text-[#F5A623]" /> hello@gangotriinfra.in
+              <a href="mailto:gangotriinfrastructure1989@gmail.com" className="flex items-center gap-2.5 hover:text-white">
+                <Mail className="h-4 w-4 text-[#F5A623]" /> gangotriinfrastructure1989@gmail.com
               </a>
               <span className="flex items-center gap-2.5">
-                <MapPin className="h-4 w-4 text-[#F5A623]" /> Pan-India installation network
+                <MapPin className="h-4 w-4 text-[#F5A623]" /> Uttar Pradesh installation network
               </span>
             </div>
           </motion.div>
@@ -204,10 +204,10 @@ export const QuoteFormSection = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid gap-6 sm:grid-cols-2">
                   <Field label="FULL NAME" name="name" type="text" placeholder="Rohan Sharma" required />
-                  <Field label="PHONE NUMBER" name="phone" type="tel" placeholder="98765 43210" required />
+                  <Field label="PHONE NUMBER" name="phone" type="tel" placeholder="91510 78495" required />
                 </div>
                 <div className="grid gap-6 sm:grid-cols-2">
-                  <Field label="CITY / PINCODE" name="city" type="text" placeholder="Pune, 411001" required />
+                  <Field label="CITY / PINCODE" name="city" type="text" placeholder="Lucknow, 411001" required />
                   <div>
                     <label className="font-['IBM_Plex_Mono'] text-[10px] tracking-[0.12em] text-white/40">
                       PROPERTY TYPE

@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 
 const meters = [
   { label: 'FOUNDED', value: '2014' },
-  { label: 'HEADQUARTERS', value: 'Nagpur, MH' },
-  { label: 'STATES COVERED', value: '14' },
+  { label: 'HEADQUARTERS', value: 'Lucknow & Shahjahanpur, UP' },
+  { label: 'SERVICE AREAS', value: 'UP Cities' },
   { label: 'TEAM STRENGTH', value: '210+' },
 ];
 
@@ -31,12 +31,12 @@ const values = [
 ];
 
 const timeline = [
-  { year: '2014', title: 'Founded in Nagpur', desc: 'Started as a 4-person residential installation team covering Vidarbha.' },
-  { year: '2017', title: 'Commercial expansion', desc: 'First 100 kW+ commercial rooftop project, moved into net-metering compliance work.' },
+  { year: '2014', title: 'Founded in Shahjahanpur', desc: 'Started as a focused residential installation team serving homes across Uttar Pradesh.' },
+  { year: '2017', title: 'Lucknow expansion', desc: 'Moved into commercial rooftop projects, net-metering compliance, and office solar support.' },
   { year: '2019', title: 'ISO 9001 certification', desc: 'Formalized quality management systems across installation and maintenance.' },
   { year: '2021', title: 'Industrial-scale projects', desc: 'Crossed 50 MW installed capacity with first factory-floor deployments.' },
-  { year: '2023', title: 'Pan-India network', desc: 'Extended installation and support network to 14 states.' },
-  { year: '2025', title: '150 MW milestone', desc: 'Crossed 5,000 installations and 150 MW of installed capacity nationwide.' },
+  { year: '2023', title: 'UP service network', desc: 'Extended installation and support coverage across Shahjahanpur, Lucknow, Moradabad, Bareilly and nearby cities.' },
+  { year: '2025', title: '150 MW milestone', desc: 'Crossed 5,000 installations and 150 MW of installed capacity across active service regions.' },
 ];
 
 const certifications = [
@@ -46,7 +46,7 @@ const certifications = [
 ];
 
 const leadership = [
-  { role: 'Managing Director', dept: 'Founder, Operations' },
+  { role: 'Managing Director', dept: 'Founder, Operations', image: '/images/projects/managing-director.png' },
   { role: 'Chief Engineer', dept: 'Design & Compliance' },
   { role: 'Head of Projects', dept: 'Commercial & Industrial' },
   { role: 'Head of Support', dept: 'Maintenance & Service' },
@@ -150,8 +150,8 @@ function StorySection() {
             </h2>
             <div className="mt-6 space-y-4 text-base leading-relaxed text-[#0B1220]/60">
               <p>
-                Gangotri Infrastructure began in 2014 in Nagpur, installing
-                rooftop panels on homes across Vidarbha before net metering
+                Gangotri Infrastructure began in 2014 in Shahjahanpur, installing
+                rooftop panels on homes across Uttar Pradesh before net metering
                 was common and before most electricians in the region had
                 even seen a solar inverter up close.
               </p>
@@ -159,7 +159,7 @@ function StorySection() {
                 What started as residential installs grew into commercial
                 and industrial work simply because customers kept asking —
                 could you do this for our factory, our warehouse, our
-                office building? Each project pushed the engineering further:
+                office building in Lucknow or Moradabad? Each project pushed the engineering further:
                 monsoon-rated mounting, DISCOM paperwork, load calculations
                 for machinery that never really shuts off.
               </p>
@@ -359,9 +359,22 @@ function LeadershipSection() {
               transition={{ duration: 0.5, delay: 0.05 + i * 0.08 }}
               className="overflow-hidden rounded-lg border border-[#0B1220]/10"
             >
-              {/* Swap in a real headshot at /images/team/{i}.jpg */}
-              <div className="relative aspect-square bg-[#0B1220]">
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(245,166,35,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(245,166,35,0.08)_1px,transparent_1px)] bg-[size:20px_20px]" />
+              <div className="relative aspect-square overflow-hidden bg-[#0B1220]">
+                {'image' in person && person.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={person.image}
+                    alt={person.role}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  <>
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(245,166,35,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(245,166,35,0.08)_1px,transparent_1px)] bg-[size:20px_20px]" />
+                    <div className="absolute left-1/2 top-[18%] h-[22%] w-[22%] -translate-x-1/2 rounded-full bg-white/20" />
+                    <div className="absolute left-1/2 top-[45%] h-[42%] w-[58%] -translate-x-1/2 rounded-t-full bg-white/15" />
+                    <div className="absolute inset-x-8 bottom-0 h-[30%] rounded-t-[40%] bg-[#F5A623]/20" />
+                  </>
+                )}
               </div>
               <div className="px-4 py-3">
                 <div className="font-['Space_Grotesk'] text-sm font-semibold text-[#0B1220]">{person.role}</div>

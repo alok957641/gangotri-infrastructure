@@ -28,7 +28,7 @@ const features = [
   {
     icon: Award,
     title: 'Trusted Excellence',
-    description: '5,000+ successful installations across India with 98% customer satisfaction rating.',
+    description: '5,000+ successful installations across Uttar Pradesh with 98% customer satisfaction rating.',
   },
   {
     icon: Clock,
@@ -132,7 +132,7 @@ export const TrustSection = () => {
           <h2 className="mt-4 font-['Space_Grotesk'] text-3xl font-semibold tracking-tight text-[#0B1220] md:text-4xl lg:text-[3.2rem]">
             Built to survive
             <br />
-            India&apos;s grid, not just its sun.
+            Uttar Pradesh&apos;s grid, not just its sun.
           </h2>
           <p className="mt-4 text-base font-normal leading-relaxed text-[#0B1220]/60 md:text-lg">
             Engineering discipline, transparent numbers, and support that

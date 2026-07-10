@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Navbar } from '../components/navbar';
 import { Preloader } from '../components/Preloader';
+import { SmoothScroll } from '../components/SmoothScroll';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-[#0a0a0a] font-sans antialiased">
+        <SmoothScroll />
         <Preloader />
         <Navbar />
         <main>{children}</main>

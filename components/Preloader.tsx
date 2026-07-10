@@ -5,25 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const BRAND_LINE = 'GANGOTRI INFRASTRUCTURE';
 
+// Only runs once, on the very first page load — shows the splash for
+// this long, then fades out. No longer touches link clicks at all,
+// so every <a> / <Link> on the site navigates instantly as normal.
+const DISPLAY_TIME = 2400;
+
 export const Preloader = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const MIN_DISPLAY_TIME = 1400; // so it never feels like a flicker on fast connections
-    const start = Date.now();
-
-    const finish = () => {
-      const elapsed = Date.now() - start;
-      const remaining = Math.max(MIN_DISPLAY_TIME - elapsed, 0);
-      setTimeout(() => setIsLoading(false), remaining);
-    };
-
-    if (document.readyState === 'complete') {
-      finish();
-    } else {
-      window.addEventListener('load', finish);
-      return () => window.removeEventListener('load', finish);
-    }
+    const timer = window.setTimeout(() => setIsLoading(false), DISPLAY_TIME);
+    return () => window.clearTimeout(timer);
   }, []);
 
   // Lock scroll while the preloader is up
@@ -115,9 +107,9 @@ export const Preloader = () => {
             >
               <motion.div
                 className="h-full rounded-full bg-[#F5A623]"
-                initial={{ x: '-100%' }}
-                animate={{ x: '100%' }}
-                transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
+                initial={{ width: '0%' }}
+                animate={{ width: '100%' }}
+                transition={{ duration: DISPLAY_TIME / 1000, ease: 'easeInOut' }}
               />
             </motion.div>
 
@@ -127,7 +119,7 @@ export const Preloader = () => {
               transition={{ delay: 1, duration: 0.4 }}
               className="mt-4 font-['IBM_Plex_Mono'] text-[10px] tracking-[0.2em] text-white/35 sm:text-[11px]"
             >
-              POWERING YOUR CONNECTION
+              PREPARING YOUR SOLAR EXPERIENCE
             </motion.p>
           </motion.div>
         </motion.div>

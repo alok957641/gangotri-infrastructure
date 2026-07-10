@@ -82,11 +82,11 @@ export const CtaSection = () => {
             </a>
           </Button>
           <a
-            href="tel:+919876543210"
+            href="tel:+919151078495"
             className="group flex items-center gap-2 rounded-md border border-black/15 px-6 py-[13px] text-[15px] font-medium text-black/75 transition-colors hover:border-black/30 hover:text-black"
           >
             <PhoneCall className="h-4 w-4 text-[#F5A623]" />
-            +91 98765 43210
+            +91 91510 78495
           </a>
         </motion.div>
 
@@ -100,7 +100,7 @@ export const CtaSection = () => {
           <span className="h-1 w-1 rounded-full bg-black/20" />
           <span>5,000+ INSTALLATIONS</span>
           <span className="h-1 w-1 rounded-full bg-black/20" />
-          <span>14 STATES COVERED</span>
+          <span>UP SERVICE AREAS</span>
           <span className="h-1 w-1 rounded-full bg-black/20" />
           <span>25-YEAR PANEL WARRANTY</span>
         </motion.div>

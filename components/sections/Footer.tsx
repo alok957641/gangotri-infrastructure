@@ -122,17 +122,17 @@ export const Footer = () => {
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/45">
               Engineering rooftop, commercial, and industrial solar systems
-              across India — from site survey to net metering.
+              across Uttar Pradesh — from site survey to net metering.
             </p>
             <div className="mt-6 space-y-2.5 font-['IBM_Plex_Mono'] text-sm text-white/50">
               <a href="tel:+911234567890" className="flex items-center gap-2.5 hover:text-white">
-                <Phone className="h-3.5 w-3.5 text-[#F5A623]" /> +91 12345 67890
+                <Phone className="h-3.5 w-3.5 text-[#F5A623]" /> +91 91510 78495
               </a>
-              <a href="mailto:hello@gangotriinfra.in" className="flex items-center gap-2.5 hover:text-white">
-                <Mail className="h-3.5 w-3.5 text-[#F5A623]" /> hello@gangotriinfra.in
+              <a href="mailto:gangotriinfrastructure1989@gmail.com" className="flex items-center gap-2.5 hover:text-white">
+                <Mail className="h-3.5 w-3.5 text-[#F5A623]" /> gangotriinfrastructure1989@gmail.com
               </a>
               <span className="flex items-center gap-2.5">
-                <MapPin className="h-3.5 w-3.5 text-[#F5A623]" /> Pan-India network
+                <MapPin className="h-3.5 w-3.5 text-[#F5A623]" /> Uttar Pradesh service network
               </span>
             </div>
           </motion.div>

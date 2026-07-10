@@ -151,7 +151,7 @@ export const Navbar = () => {
 
           <div className="flex items-center gap-3">
             <Button className="hidden rounded-md bg-[#F5A623] px-5 py-5 text-sm font-semibold text-[#0B1220] hover:bg-[#f6b046] lg:inline-flex" asChild>
-              <a href="#quote">Get Free Quote<ArrowRight className="ml-1.5 h-3.5 w-3.5" /></a>
+              <a href="/contact">Get Free Quote<ArrowRight className="ml-1.5 h-3.5 w-3.5" /></a>
             </Button>
             <button onClick={() => setIsMobileOpen(true)} className={cn('flex h-10 w-10 items-center justify-center rounded-full transition-colors lg:hidden', isScrolled ? 'text-[#0B1220] hover:bg-black/5' : 'text-white hover:bg-white/10')} aria-label="Open menu">
               <Menu className="h-5 w-5" />
@@ -214,7 +214,7 @@ export const Navbar = () => {
 
               <div className="mt-auto pt-6">
                 <Button className="w-full rounded-md bg-[#F5A623] py-6 text-base font-semibold text-[#0B1220] hover:bg-[#f6b046]" asChild>
-                  <a href="#quote" onClick={() => setIsMobileOpen(false)}>Get Free Quote<ArrowRight className="ml-2 h-4 w-4" /></a>
+                  <a href="/contact" onClick={() => setIsMobileOpen(false)}>Get Free Quote<ArrowRight className="ml-2 h-4 w-4" /></a>
                 </Button>
                 <div className="mt-4 flex justify-center gap-6 font-['IBM_Plex_Mono'] text-xs text-[#0B1220]/35">
                   <span>ISO 9001:2025</span><span>•</span><span>5,000+ Installations</span>

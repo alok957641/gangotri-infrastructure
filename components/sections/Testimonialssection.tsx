@@ -10,7 +10,7 @@ import { Star, Quote } from 'lucide-react';
 const testimonials = [
   {
     name: 'Rajesh Deshmukh',
-    location: 'Nagpur, MH',
+    location: 'Shahjahanpur, UP',
     system: '4 kW Residential',
     rating: 5,
     quote:
@@ -18,7 +18,7 @@ const testimonials = [
   },
   {
     name: 'Priya Kulkarni',
-    location: 'Pune, MH',
+    location: 'Lucknow, UP',
     system: '6 kW Residential',
     rating: 5,
     quote:
@@ -26,7 +26,7 @@ const testimonials = [
   },
   {
     name: 'Suresh Industries',
-    location: 'Nashik, MH',
+    location: 'Moradabad, UP',
     system: '85 kW Commercial',
     rating: 5,
     quote:
@@ -34,7 +34,7 @@ const testimonials = [
   },
   {
     name: 'Anita Bhosale',
-    location: 'Amravati, MH',
+    location: 'Bareilly, UP',
     system: '3 kW Residential',
     rating: 4,
     quote:
@@ -42,7 +42,7 @@ const testimonials = [
   },
   {
     name: 'Vikram Chauhan',
-    location: 'Nagpur, MH',
+    location: 'Shahjahanpur, UP',
     system: '5 kW Residential',
     rating: 5,
     quote:
@@ -50,7 +50,7 @@ const testimonials = [
   },
   {
     name: 'Meera Textiles Pvt. Ltd.',
-    location: 'Amravati, MH',
+    location: 'Bareilly, UP',
     system: '210 kW Industrial',
     rating: 5,
     quote:
@@ -58,7 +58,7 @@ const testimonials = [
   },
   {
     name: 'Sanjay Patil',
-    location: 'Pune, MH',
+    location: 'Lucknow, UP',
     system: '4 kW Residential',
     rating: 5,
     quote:
@@ -66,7 +66,7 @@ const testimonials = [
   },
   {
     name: 'Kavita Joshi',
-    location: 'Nashik, MH',
+    location: 'Moradabad, UP',
     system: '3.5 kW Residential',
     rating: 4,
     quote:
@@ -210,7 +210,7 @@ export const TestimonialsSection = () => {
             className="mt-3 text-base leading-relaxed text-white/55"
           >
             Unedited feedback from residential, commercial, and industrial
-            installs across Maharashtra — the same crews, month after month.
+            installs across Uttar Pradesh — the same crews, month after month.
           </motion.p>
         </motion.div>
       </div>

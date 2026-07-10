@@ -82,7 +82,7 @@ const services = [
       'Phased rollout for multi-unit facilities',
       'Crossed 50 MW industrial capacity in 2021',
     ],
-    stat: { value: '150 MW', label: 'installed capacity nationwide' },
+    stat: { value: '150 MW', label: 'installed capacity across Uttar Pradesh' },
     image: '/images/projects/industrial-solar.jpg',
   },
   {
@@ -370,7 +370,7 @@ function ServiceSection({
               </div>
 
               <a
-                href="#quote"
+                href="/contact"
                 className={`group ml-auto flex items-center gap-1.5 text-sm font-semibold ${
                   isDark ? 'text-white' : 'text-black'
                 }`}

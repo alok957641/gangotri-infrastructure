@@ -366,7 +366,7 @@ function ProductSection({
               </div>
 
               <a
-                href="#quote"
+                href="/contact"
                 className={`group ml-auto flex items-center gap-1.5 text-sm font-semibold ${
                   isDark ? 'text-white' : 'text-black'
                 }`}

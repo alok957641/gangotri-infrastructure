@@ -186,7 +186,7 @@ const HeroSection = () => {
         >
           Engineered for the
           <br />
-          Indian grid,
+          UP grid,
           <span className="text-[#F5A623]"> not the brochure.</span>
         </motion.h1>
 
@@ -200,7 +200,7 @@ const HeroSection = () => {
         >
           Monsoon-rated mounting, DISCOM-approved net metering, and subsidy
           paperwork handled end to end — installed by crews who&apos;ve done
-          this on 5,000+ Indian rooftops.
+          this on 5,000+ UP rooftops.
         </motion.p>
 
         {/* CTAs */}
