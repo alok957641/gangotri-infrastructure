@@ -169,7 +169,7 @@ export const Footer = () => {
           >
             {/* 👇 Yaha apni PNG image ka path dena hai */}
             <img
-              src="/nexova-x-logo.png"
+              src="/nexova.png"
               alt="Nexova X"
               className="h-6 w-auto"
             />
