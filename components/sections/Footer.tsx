@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin, ExternalLink } from 'lucide-react';
 
 const columns = [
   {
@@ -41,20 +41,15 @@ export const Footer = () => {
   const shouldReduceMotion = useReducedMotion();
 
   // -------- SCROLL-DRIVEN EFFECTS (subtle) --------
-  // Grid opacity – fades in as scroll reaches footer
   const gridOpacity = useTransform(scrollY, [0, 800], [0, 0.7]);
-
-  // Glow movement – moves horizontally
   const glowX = useTransform(scrollY, [0, 1000], ['-30%', '10%']);
   const glowOpacity = useTransform(scrollY, [0, 800], [0, 0.6]);
 
-  // Bottom bar – slides up (only once when in view)
   const barVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: 0.4 } },
   };
 
-  // Container stagger for columns
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -157,6 +152,37 @@ export const Footer = () => {
               </ul>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* ── Centered “Design & Developed by” badge ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="flex justify-center pb-8"
+        >
+          <a
+            href="https://www.nexovax.in/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-3 rounded-full bg-white px-5 py-2.5 shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
+          >
+            {/* 👇 Yaha apni PNG image ka path dena hai */}
+            <img
+              src="/nexova-x-logo.png"
+              alt="Nexova X"
+              className="h-6 w-auto"
+            />
+            <div className="flex flex-col text-left">
+              <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                Design &amp; Developed by
+              </span>
+              <span className="font-['Space_Grotesk'] text-sm font-bold text-gray-900">
+                Nexova X
+              </span>
+            </div>
+            <ExternalLink className="h-4 w-4 text-gray-400 transition-colors group-hover:text-[#F5A623]" />
+          </a>
         </motion.div>
 
         {/* Bottom bar – slide up on view */}
